@@ -23,8 +23,7 @@
 #include <stdio.h>
 
 class Game {
-    public:
-        u32 h, w, mines;
+    public:      
         Game(u32, u32, u32, Helper::State*);
         void update();
     private:
@@ -41,16 +40,18 @@ class Game {
         u8* mine_tile = (u8*)mine_bin;
         u8* flagged_tile = (u8*)flag_bin;
 
-        void render();
+        u32 h, w, mines;
         Helper::State *state;
-        void renderBoard();
-        
+        enum TileState {OPEN, UNOPENNED, FLAGGED};
+        std::vector<std::vector<std::pair<int, Game::TileState>>> board;
+        std::pair<int, int> cursor_pos;
+
+        void render();        
+        void renderBoard();        
         void addMines();
         void countMines();
         bool isMine(u32 x, u32 y);
-        enum TileState {OPEN, UNOPENNED, FLAGGED};
-
-        std::vector<std::vector<std::pair<int, Game::TileState>>> board;
+        void moveCursor(int xdir, int ydir);        
 };
 
 #endif

@@ -9,6 +9,22 @@ void Game::update() {
         *(this->state) = Helper::menu_s;
     }
 
+    if (kDown & KEY_UP) {
+        Game::moveCursor(0, -1);
+    }
+
+    if (kDown & KEY_LEFT) {
+        Game::moveCursor(-1, 0);
+    }
+
+    if (kDown & KEY_RIGHT) {
+        Game::moveCursor(1, 0);
+    }
+    
+    if (kDown & KEY_DOWN) {
+        Game::moveCursor(0, 1);
+    }
+
     Game::render();
 }
 
@@ -18,6 +34,7 @@ Game::Game(u32 h, u32 w, u32 mines, Helper::State *state) {
     this->mines = mines;
     this->state = state;
     *(this->state) = Helper::game_s;
+    this->cursor_pos = std::make_pair(-1,-1);
 
     this->board =  std::vector<std::vector<std::pair<int, Game::TileState>>>(h, std::vector<std::pair<int, Game::TileState>>(w));
 
@@ -29,7 +46,7 @@ void Game::addMines() {
     u32 i, j;
     for (i = 0; i < this->h; i++) {
         for (j = 0; j < this->w; j++) {
-            this->board[i][j] = std::make_pair(0, Game::UNOPENNED);
+            this->board[i][j] = std::make_pair(0, Game::OPEN);
         }
     }
     
@@ -49,6 +66,29 @@ void Game::addMines() {
     }
 }
 
+void Game::moveCursor(int xdir, int ydir) {
+    if (this->cursor_pos.first == -1 || this->cursor_pos.second == -1) {
+        this->cursor_pos.first = 0;
+        this->cursor_pos.second = 0;
+    } else {
+        if (this->cursor_pos.first == 0 && xdir == -1) {
+            this->cursor_pos.first = this->w - 1; 
+        } else if (this->cursor_pos.first == this->w - 1 && xdir == 1) {
+            this->cursor_pos.first = 0;
+        } else {
+            cursor_pos.first += xdir;
+        }
+
+        if (this->cursor_pos.second == 0 && ydir == -1) {
+            this->cursor_pos.second = this->h - 1;
+        } else if (this->cursor_pos.second == this->h - 1 && ydir == 1) {
+            this->cursor_pos.second = 0;
+        } else {
+            cursor_pos.second += ydir;
+        }
+    }
+}
+
 bool Game::isMine(u32 x, u32 y) {
     if (x >= this->w || x < 0 || y >= this->h || y < 0) {
         return false;
@@ -64,6 +104,13 @@ void Game::countMines() {
     for (i = 0; i < this->h; i++) {
         for (j = 0; j < this->w; j++) {
             if (board[i][j].first != BOMB) {
+                
+                for (int k = -1; k <= 1; k++) {
+                    for (int l = -1; l <= 1; l++) {
+                        board[i][j].first += isMine(j+k, i+l) ? 1 : 0;
+                    }
+                }
+                /*
                 board[i][j].first += isMine(j+1, i) ? 1 : 0;
                 board[i][j].first += isMine(j-1, i) ? 1 : 0;
                 board[i][j].first += isMine(j, i+1) ? 1 : 0;
@@ -72,6 +119,7 @@ void Game::countMines() {
                 board[i][j].first += isMine(j-1, i-1) ? 1 : 0;
                 board[i][j].first += isMine(j-1, i+1) ? 1 : 0;
                 board[i][j].first += isMine(j+1, i-1) ? 1 : 0;
+                */
             }            
         }
     }
@@ -85,8 +133,9 @@ void Game::render() {
     //Helper::drawRectangle(320, 30, 640, 640, color);
     
     Game::renderBoard();
-
 }
+
+
 
 void Game::renderBoard() {
     u32 board_color = RGBA8_MAXALPHA(128, 128, 128);
@@ -135,6 +184,11 @@ void Game::renderBoard() {
                         Helper::renderImage(y+1, x+1, 38, 38, this->eight_tile);
                         break;                    
                 }
+            }
+
+            if (this->cursor_pos.first == j && this->cursor_pos.second == i) {
+                u32 cur_color = RGBA8_MAXALPHA(0, 0, 0);
+                Helper::drawCursor(x+1, y+1, 38, 38, 4, cur_color);
             }
             
             x += 40;
