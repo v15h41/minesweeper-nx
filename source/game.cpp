@@ -6,6 +6,12 @@ void Game::update() {
     u64 kDown = hidKeysDown(CONTROLLER_P1_AUTO);
 
     if (kDown & KEY_A) {
+        if (Game::checkCursorExists()) {
+            Game::openBlock(this->cursor_pos.first, this->cursor_pos.second);
+        }
+    }
+
+    if (kDown & KEY_X) {
         *(this->state) = Helper::menu_s;
     }
 
@@ -46,7 +52,7 @@ void Game::addMines() {
     u32 i, j;
     for (i = 0; i < this->h; i++) {
         for (j = 0; j < this->w; j++) {
-            this->board[i][j] = std::make_pair(0, Game::OPEN);
+            this->board[i][j] = std::make_pair(0, Game::UNOPENNED);
         }
     }
     
@@ -54,11 +60,9 @@ void Game::addMines() {
     for (i = 0; i < this->mines; i++) {
         int x, y;
 
-        do {
-            
+        do {            
             x = rand() % this->w;
             y = rand() % this->h;
-            
         } 
         while (this->board[y][x].first == BOMB);
 
@@ -66,11 +70,19 @@ void Game::addMines() {
     }
 }
 
-void Game::moveCursor(int xdir, int ydir) {
+bool Game::checkCursorExists() {
     if (this->cursor_pos.first == -1 || this->cursor_pos.second == -1) {
         this->cursor_pos.first = 0;
         this->cursor_pos.second = 0;
-    } else {
+
+        return false;
+    }
+
+    return true;
+}
+
+void Game::moveCursor(int xdir, int ydir) {
+    if (Game::checkCursorExists()) {
         if (this->cursor_pos.first == 0 && xdir == -1) {
             this->cursor_pos.first = this->w - 1; 
         } else if (this->cursor_pos.first == this->w - 1 && xdir == 1) {
@@ -89,8 +101,33 @@ void Game::moveCursor(int xdir, int ydir) {
     }
 }
 
-bool Game::isMine(u32 x, u32 y) {
+void Game::openBlock(u32 x, u32 y) {
+    if (!Game::outOfBounds(x, y) && this->board[y][x].second != Game::FLAGGED 
+        && this->board[y][x].second != Game::OPEN) {
+        if (this->board[y][x].first == BOMB) {
+            //game over
+        } else if (this->board[y][x].first != 0) {
+            this->board[y][x].second = Game::OPEN;
+        } else {
+            this->board[y][x].second = Game::OPEN;
+            for (int i = -1; i <= 1; i++) {
+                for (int j = -1; j <= 1; j++) {
+                    Game::openBlock(x+i, y+j);
+                }
+            }
+        }
+    }    
+}
+
+bool Game::outOfBounds(int x, int y) {
     if (x >= this->w || x < 0 || y >= this->h || y < 0) {
+        return true;
+    }
+    return false;
+}
+
+bool Game::isMine(u32 x, u32 y) {
+    if (Game::outOfBounds(x, y)) {
         return false;
     } else if (this->board[y][x].first == BOMB) {
         return true;
@@ -103,23 +140,12 @@ void Game::countMines() {
     u32 i, j;
     for (i = 0; i < this->h; i++) {
         for (j = 0; j < this->w; j++) {
-            if (board[i][j].first != BOMB) {
-                
+            if (board[i][j].first != BOMB) {                
                 for (int k = -1; k <= 1; k++) {
                     for (int l = -1; l <= 1; l++) {
                         board[i][j].first += isMine(j+k, i+l) ? 1 : 0;
                     }
-                }
-                /*
-                board[i][j].first += isMine(j+1, i) ? 1 : 0;
-                board[i][j].first += isMine(j-1, i) ? 1 : 0;
-                board[i][j].first += isMine(j, i+1) ? 1 : 0;
-                board[i][j].first += isMine(j, i-1) ? 1 : 0;
-                board[i][j].first += isMine(j+1, i+1) ? 1 : 0;
-                board[i][j].first += isMine(j-1, i-1) ? 1 : 0;
-                board[i][j].first += isMine(j-1, i+1) ? 1 : 0;
-                board[i][j].first += isMine(j+1, i-1) ? 1 : 0;
-                */
+                }               
             }            
         }
     }

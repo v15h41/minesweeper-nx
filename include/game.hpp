@@ -51,7 +51,10 @@ class Game {
         void addMines();
         void countMines();
         bool isMine(u32 x, u32 y);
-        void moveCursor(int xdir, int ydir);        
+        void moveCursor(int xdir, int ydir);    
+        void openBlock(u32 x, u32 y);
+        bool checkCursorExists();    
+        bool outOfBounds(int x, int y);
 };
 
 #endif
