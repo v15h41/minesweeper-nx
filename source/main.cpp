@@ -16,6 +16,8 @@ int main(int argc, char **argv) {
     //Set current resolution automatically depending on current/changed OperationMode. Only use this when using gfxInitResolution*().
     //gfxConfigureAutoResolutionDefault(true);
     
+    //consoleInit(NULL);
+
     Helper::State state = Helper::menu_s;
 
     Menu menu(&state);
@@ -30,6 +32,7 @@ int main(int argc, char **argv) {
 
         if (kDown & KEY_PLUS) break; // break in order to return to hbmenu
 
+        //turn this into switch statements
         if (state == Helper::menu_s) {
             menu.update(); 
         } else if (state == Helper::game_s) {
@@ -39,7 +42,7 @@ int main(int argc, char **argv) {
         } else if (state == Helper::forty) {
             game = new Game(16, 16, 40, &state);
         } else if (state == Helper::ninetynine) {
-            game = new Game(30, 16, 99, &state);
+            game = new Game(16, 30, 99, &state);
         }
         
         gfxFlushBuffers();
