@@ -7,7 +7,17 @@ void Game::update() {
 
     if (kDown & KEY_A) {
         if (Game::checkCursorExists()) {
-            Game::openBlock(this->cursor_pos.first, this->cursor_pos.second);
+            if (this->board[this->cursor_pos.second][this->cursor_pos.first].second == Game::OPEN) {
+                Game::checkNumberSatisfied(this->cursor_pos.first, this->cursor_pos.second);
+            } else {
+                Game::openBlock(this->cursor_pos.first, this->cursor_pos.second);
+            }
+        }
+    }
+
+    if (kDown & KEY_B) {
+        if (Game::checkCursorExists()) {
+            Game::flagBlock(this->cursor_pos.first, this->cursor_pos.second);
         }
     }
 
@@ -117,6 +127,34 @@ void Game::openBlock(u32 x, u32 y) {
             }
         }
     }    
+}
+
+void Game::flagBlock(int x, int y) {
+    if (this->board[y][x].second == Game::UNOPENNED) {
+        this->board[y][x].second = Game::FLAGGED;
+    } else if (this->board[y][x].second == Game::FLAGGED) {
+        this->board[y][x].second = Game::UNOPENNED;
+    }
+}
+
+void Game::checkNumberSatisfied(int x, int y) {
+    int flags = 0;
+
+    for (int i = -1; i <= 1; i++) {
+        for (int j = -1; j <= 1; j++) {
+            if (!Game::outOfBounds(x+i, y+j) && this->board[y+j][x+i].second == FLAGGED) {
+                flags++;
+            }
+        }
+    }
+
+    if (flags == this->board[y][x].first) {
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                Game::openBlock(x+i, y+j);
+            }
+        }
+    }
 }
 
 bool Game::outOfBounds(int x, int y) {

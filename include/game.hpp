@@ -55,6 +55,8 @@ class Game {
         void openBlock(u32 x, u32 y);
         bool checkCursorExists();    
         bool outOfBounds(int x, int y);
+        void flagBlock(int x, int y);
+        void checkNumberSatisfied(int x, int y);
 };
 
 #endif
