@@ -21,6 +21,7 @@
 #include <stdlib.h> 
 #include <ctime>
 #include <stdio.h>
+#include "mines.hpp"
 
 class Game {
     public:      
@@ -40,23 +41,16 @@ class Game {
         u8* mine_tile = (u8*)mine_bin;
         u8* flagged_tile = (u8*)flag_bin;
 
-        u32 h, w, mines;
+        u32 h, w;
         Helper::State *state;
-        enum TileState {OPEN, UNOPENNED, FLAGGED};
-        std::vector<std::vector<std::pair<int, Game::TileState>>> board;
         std::pair<int, int> cursor_pos;
+        Mines *mines;
+
 
         void render();        
         void renderBoard();        
-        void addMines();
-        void countMines();
-        bool isMine(u32 x, u32 y);
-        void moveCursor(int xdir, int ydir);    
-        void openBlock(u32 x, u32 y);
-        bool checkCursorExists();    
-        bool outOfBounds(int x, int y);
-        void flagBlock(int x, int y);
-        void checkNumberSatisfied(int x, int y);
+        bool checkCursorExists();
+        void moveCursor(int xdir, int ydir); 
 };
 
 #endif
