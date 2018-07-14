@@ -17,6 +17,7 @@ Mines::Mines(u32 h, u32 w, u32 mines) {
 
 void Mines::attemptOpenBlock(u32 x, u32 y) {
     if (this->board[y][x].second == Mines::OPEN) {
+        Mines::flagRemaining(x, y);
         Mines::checkNumberSatisfied(x, y);
     } else {
         Mines::openBlock(x, y);
@@ -39,6 +40,28 @@ void Mines::checkWin() {
 
 Mines::GameState Mines::getGameState() {
     return this->state;
+}
+
+void Mines::flagRemaining(u32 x, u32 y) {
+    int blocks = 0;
+
+    for (int i = -1; i <= 1; i++) {
+        for (int j = -1; j <= 1; j++) {
+            if (!Mines::outOfBounds(x+i, y+j) && (this->board[y+j][x+i].second == Mines::UNOPENNED || this->board[y+j][x+i].second == Mines::FLAGGED)) {
+                blocks++;
+            }
+        }
+    }
+
+    if (blocks == this->board[y][x].first) {
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                if (!Mines::outOfBounds(x+i, y+j) && this->board[y+j][x+i].second == Mines::UNOPENNED) {
+                    Mines::flagBlock(x+i, y+j);
+                }
+            }
+        }
+    }
 }
 
 void Mines::addMines() {

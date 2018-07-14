@@ -4,6 +4,21 @@
 
 void Game::update() {
     u64 kDown = hidKeysDown(CONTROLLER_P1_AUTO);
+    
+    touchPosition touch;
+    u32 touchCount = hidTouchCount();
+
+    if (touchCount > 0) {
+        hidTouchRead(&touch, 0);
+        std::pair<int, int> coords = Game::pixelToPos(touch.px, touch.py);
+
+        if (coords.first != -1) {
+            this->cursor_pos.first = -1;
+            this->cursor_pos.second = -1;
+
+            this->mines->attemptOpenBlock(coords.first, coords.second);
+        }
+    }
 
     if (kDown & KEY_A) {
         if (Game::checkCursorExists()) {
@@ -41,7 +56,6 @@ void Game::update() {
         *(this->state) = Helper::menu_s;
     }
     
-
     Game::render();
 }
 
@@ -55,6 +69,19 @@ Game::Game(u32 h, u32 w, u32 mines, Helper::State *state) {
     this->cursor_pos = std::make_pair(-1,-1);
 }
 
+std::pair<int, int> Game::pixelToPos(u32 x, u32 y) {
+    u32 init_y = (640-40*this->h)/2 + 30;
+    u32 init_x = (1280-40*w)/2; 
+
+    int raw_y = y - init_y;
+    int raw_x = x - init_x;
+
+    if (raw_y < 0 || raw_x < 0 || raw_y > 40*this->h || raw_x > 40*this->w) {
+        return std::make_pair(-1, -1);
+    } else {
+        return std::make_pair(raw_x/40, raw_y/40);
+    }    
+}
 
 
 bool Game::checkCursorExists() {
@@ -97,9 +124,25 @@ void Game::render() {
     //Helper::drawRectangle(320, 30, 640, 640, color);
     
     Game::renderBoard();
+    Game::renderCursor();
+    //std::string coord_string = std::to_string(this->touchx) + " " + std::to_string(this->touchy);
+    //const char* coord_s = coord_string.c_str();
+    //Helper::drawText(tahoma24, 1, 680, RGBA8_MAXALPHA(0, 0, 0), coord_s);
+    
 }
 
+void Game::renderCursor() {
+    if (this->cursor_pos.first != -1 && this->cursor_pos.second != -1) {
+        u32 y = (640-40*this->h)/2 + 30;
+        u32 x = (1280-40*w)/2; 
 
+        y += this->cursor_pos.second*40;
+        x += this->cursor_pos.first*40;
+
+        u32 cur_color = RGBA8_MAXALPHA(0, 0, 0);
+        Helper::drawCursor(x+1, y+1, 38, 38, 4, cur_color);
+    }
+}
 
 void Game::renderBoard() {
     u32 board_color = RGBA8_MAXALPHA(128, 128, 128);
@@ -150,11 +193,6 @@ void Game::renderBoard() {
                 }
             }
 
-            if (this->cursor_pos.first == j && this->cursor_pos.second == i) {
-                u32 cur_color = RGBA8_MAXALPHA(0, 0, 0);
-                Helper::drawCursor(x+1, y+1, 38, 38, 4, cur_color);
-            }
-            
             x += 40;
         }
         y += 40;

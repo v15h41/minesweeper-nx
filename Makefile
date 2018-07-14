@@ -186,6 +186,11 @@ $(OFILES_SRC)	: $(HFILES_BIN)
 	@echo $(notdir $<)
 	@$(bin2o)
 
+%.nxfnt.o	:	%.nxfnt
+
+	@echo $(notdir $<)
+	@$(bin2o)
+	
 -include $(DEPENDS)
 
 #---------------------------------------------------------------------------------------

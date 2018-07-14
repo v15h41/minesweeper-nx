@@ -35,6 +35,7 @@ class Mines {
         bool outOfBounds(int x, int y);        
         void checkNumberSatisfied(u32 x, u32 y);
         void checkWin();
+        void flagRemaining(u32 x, u32 y);
 };
 
 

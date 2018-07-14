@@ -32,3 +32,9 @@ void Helper::drawRectangle(u32 x, u32 y, u32 h, u32 w, u32 color) {
         }
     }
 }
+
+void Helper::drawText(const ffnt_header_t* font, int x, int y, u32 color, const char* str) {
+    color_t clr;
+    clr.abgr = color;
+    DrawText(font, x, y, clr, str);
+}

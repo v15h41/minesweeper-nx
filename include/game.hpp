@@ -21,7 +21,10 @@
 #include <stdlib.h> 
 #include <ctime>
 #include <stdio.h>
+extern const ffnt_header_t tahoma24_nxfnt;
+#define tahoma24 &tahoma24_nxfnt
 #include "mines.hpp"
+#include <string>
 
 class Game {
     public:      
@@ -46,9 +49,10 @@ class Game {
         std::pair<int, int> cursor_pos;
         Mines *mines;
 
-
+        std::pair<int, int> pixelToPos(u32 x, u32 y);
         void render();        
         void renderBoard();        
+        void renderCursor();
         bool checkCursorExists();
         void moveCursor(int xdir, int ydir); 
 };
