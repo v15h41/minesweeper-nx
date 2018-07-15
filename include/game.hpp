@@ -20,6 +20,7 @@
 #include <utility>
 #include <stdlib.h> 
 #include <ctime>
+#include <time.h>
 #include <stdio.h>
 extern const ffnt_header_t tahoma24_nxfnt;
 #define tahoma24 &tahoma24_nxfnt
@@ -45,6 +46,7 @@ class Game {
         u8* flagged_tile = (u8*)flag_bin;
 
         u32 h, w;
+        u32 game_time = 0;
         Helper::State *state;
         std::pair<int, int> cursor_pos;
         Mines *mines;
@@ -55,6 +57,9 @@ class Game {
         void renderCursor();
         bool checkCursorExists();
         void moveCursor(int xdir, int ydir); 
+        u32 timeElapsed(u32 time);
+        void startGameTimer();
+        void renderTime();
 };
 
 #endif

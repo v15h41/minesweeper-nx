@@ -13,6 +13,7 @@ void Game::update() {
         std::pair<int, int> coords = Game::pixelToPos(touch.px, touch.py);
 
         if (coords.first != -1) {
+            Game::startGameTimer();
             this->cursor_pos.first = -1;
             this->cursor_pos.second = -1;
 
@@ -22,6 +23,7 @@ void Game::update() {
 
     if (kDown & KEY_A) {
         if (Game::checkCursorExists()) {
+            Game::startGameTimer();
             this->mines->attemptOpenBlock(this->cursor_pos.first, this->cursor_pos.second);
         }
     }
@@ -69,6 +71,12 @@ Game::Game(u32 h, u32 w, u32 mines, Helper::State *state) {
     this->cursor_pos = std::make_pair(-1,-1);
 }
 
+void Game::startGameTimer() {
+    if (this->game_time == 0) {
+        this->game_time = time(NULL);
+    }
+}
+
 std::pair<int, int> Game::pixelToPos(u32 x, u32 y) {
     u32 init_y = (640-40*this->h)/2 + 30;
     u32 init_x = (1280-40*w)/2; 
@@ -83,6 +91,11 @@ std::pair<int, int> Game::pixelToPos(u32 x, u32 y) {
     }    
 }
 
+u32 Game::timeElapsed(u32 time) {
+    time_t unixTime = std::time(NULL);
+
+    return unixTime - time;
+}
 
 bool Game::checkCursorExists() {
     if (this->cursor_pos.first == -1 || this->cursor_pos.second == -1) {
@@ -115,6 +128,18 @@ void Game::moveCursor(int xdir, int ydir) {
     }
 }
 
+void Game::renderTime() {
+    std::string time_string;
+
+    if (this->game_time == 0) {
+        time_string = std::to_string(0);
+    } else {
+        time_string = std::to_string(Game::timeElapsed(this->game_time));
+    }
+
+    Helper::drawText(tahoma24, 1, 680, RGBA8_MAXALPHA(0, 0, 0), time_string.c_str());
+}
+
 
 void Game::render() {
     //Helper::renderImage(10, 10, 164, 164, this->smiley_pic);
@@ -128,8 +153,11 @@ void Game::render() {
     //std::string coord_string = std::to_string(this->touchx) + " " + std::to_string(this->touchy);
     //const char* coord_s = coord_string.c_str();
     //Helper::drawText(tahoma24, 1, 680, RGBA8_MAXALPHA(0, 0, 0), coord_s);
+    Game::renderTime();
     
 }
+
+
 
 void Game::renderCursor() {
     if (this->cursor_pos.first != -1 && this->cursor_pos.second != -1) {
