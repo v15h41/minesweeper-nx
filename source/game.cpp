@@ -1,4 +1,5 @@
 #include "game.hpp"
+#include <sys/time.h>
 
 #define BOMB -1
 
