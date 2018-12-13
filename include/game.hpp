@@ -46,7 +46,7 @@ class Game {
         u8* flagged_tile = (u8*)flag_bin;
 
         u32 h, w;
-        u32 game_time = 0;
+        long long game_time = 0;
         Helper::State *state;
         std::pair<int, int> cursor_pos;
         Mines *mines;
@@ -57,9 +57,11 @@ class Game {
         void renderCursor();
         bool checkCursorExists();
         void moveCursor(int xdir, int ydir); 
-        u32 timeElapsed(u32 time);
+        long long timeElapsed(long long time);
         void startGameTimer();
         void renderTime();
+        long long getCurrentTime();    
+        void renderEnd();    
 };
 
 #endif

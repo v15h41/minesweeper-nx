@@ -5,6 +5,9 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "helper.hpp"
+#include <string>
+extern const ffnt_header_t tahoma24_nxfnt;
+#define tahoma24 &tahoma24_nxfnt
 
 class Menu {
     public:
